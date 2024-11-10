@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório de Inspeção</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-top: 40px;
+        }
+
+        h3, h4 {
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="date"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            height: 120px;
+            resize: none;
+        }
+
+        .button {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: center;
+            display: inline-block;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        .button:hover {
+            background-color: #2980b9;
+        }
+
+        hr {
+            border: 0;
+            height: 1px;
+            background-color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .file-upload {
+            margin-bottom: 20px;
+        }
+
+        .photo-description {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h3>Título: Inspeção de Conformidade</h3>
+    <hr>
+
+    <h4>Informações do Responsável pela Inspeção</h4>
+    <div class="form-group">
+        <label for="nome">Nome</label>
+        <input type="text" id="nome" placeholder="Digite o nome" required>
+    </div>
+    <div class="form-group">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" placeholder="Digite o e-mail" required>
+    </div>
+    <div class="form-group">
+        <label for="telefone">Telefone</label>
+        <input type="tel" id="telefone" placeholder="Digite o telefone" required>
+    </div>
+    <hr>
+
+    <h4>Descrição da Situação</h4>
+    <div class="form-group">
+        <textarea id="descricao" placeholder="Relate a situação encontrada..." required></textarea>
+    </div>
+    <hr>
+
+    <h4>Evidências</h4>
+    <p>Para auxiliar na documentação, inclua abaixo as fotos registradas como evidências da inspeção.</p>
+    
+    <!-- Container para campos de upload de foto e descrição -->
+    <div id="photo-upload-container">
+        <!-- Exemplo de campos de upload de foto e descrição -->
+        <div class="file-upload">
+            <label for="foto1">Foto 1</label>
+            <input type="file" id="foto1" accept="image/*">
+            <div class="photo-description">
+                <label for="descricao_foto1">Descrição:</label>
+                <input type="text" id="descricao_foto1" placeholder="Descrição da Foto 1">
+            </div>
+        </div>
+    </div>
+
+    <!-- Botão para adicionar mais fotos -->
+    <button class="button" onclick="adicionarFoto()">Adicionar Foto</button>
+    <hr>
+
+    <h3>Conclusão da Inspeção</h3>
+    <div class="form-group">
+        <textarea id="observacoes_finais" placeholder="Inclua observações e recomendações finais..."></textarea>
+    </div>
+    <hr>
+
+    <div class="form-group">
+        <label for="data_inspecao">Data da Inspeção</label>
+        <input type="date" id="data_inspecao">
+    </div>
+    <div class="form-group">
+        <label for="assinatura">Assinatura do Inspetor</label>
+        <input type="text" id="assinatura" placeholder="Nome do Inspetor">
+    </div>
+
+    <button class="button" onclick="gerarPDF()">Gerar PDF</button>
+</div>
+
+<script>
+    let fotoCount = 1;
+
+    function adicionarFoto() {
+        fotoCount++;
+        const container = document.getElementById("photo-upload-container");
+
+        const fileUploadDiv = document.createElement("div");
+        fileUploadDiv.classList.add("file-upload");
+
+        const label = document.createElement("label");
+        label.textContent = "Foto " + fotoCount;
+        label.setAttribute("for", "foto" + fotoCount);
+
+        const inputFile = document.createElement("input");
+        inputFile.type = "file";
+        inputFile.id = "foto" + fotoCount;
+        inputFile.accept = "image/*";
+
+        const descriptionDiv = document.createElement("div");
+        descriptionDiv.classList.add("photo-description");
+
+        const descriptionLabel = document.createElement("label");
+        descriptionLabel.setAttribute("for", "descricao_foto" + fotoCount);
+        descriptionLabel.textContent = "Descrição:";
+
+        const descriptionInput = document.createElement("input");
+        descriptionInput.type = "text";
+        descriptionInput.id = "descricao_foto" + fotoCount;
+        descriptionInput.placeholder = "Descrição da Foto " + fotoCount;
+
+        descriptionDiv.appendChild(descriptionLabel);
+        descriptionDiv.appendChild(descriptionInput);
+
+        fileUploadDiv.appendChild(label);
+        fileUploadDiv.appendChild(inputFile);
+        fileUploadDiv.appendChild(descriptionDiv);
+
+        container.appendChild(fileUploadDiv);
+    }
+
+    function getBase64(file, callback) {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => callback(reader.result);
+        reader.onerror = error => console.error('Erro ao carregar imagem:', error);
+    }
+
+    function gerarPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        let yPosition = 30;
+        doc.setFontSize(14);
+
+        function addWrappedTextToPDF(text, xPos = 10, lineHeight = 10) {
+            const lines = doc.splitTextToSize(text, 180);
+            lines.forEach(line => {
+                if (yPosition + lineHeight > 280) {
+                    doc.addPage();
+                    yPosition = 30;
+                }
+                doc.text(line, xPos, yPosition);
+                yPosition += lineHeight;
+            });
+        }
+
+        const nome = document.getElementById('nome').value;
+        const email = document.getElementById('email').value;
+        const telefone = document.getElementById('telefone').value;
+        const descricao = document.getElementById('descricao').value;
+        
+        addWrappedTextToPDF("Nome: " + nome);
+        addWrappedTextToPDF("E-mail: " + email);
+        addWrappedTextToPDF("Telefone: " + telefone);
+        addWrappedTextToPDF("Descrição da Situação: ");
+        addWrappedTextToPDF(descricao);
+
+        function processNextImage(index) {
+            const fotoInput = document.getElementById("foto" + index);
+            const descricaoFoto = document.getElementById("descricao_foto" + index).value;
+
+            if (fotoInput && fotoInput.files.length > 0) {
+                getBase64(fotoInput.files[0], (base64) => {
+                    if (yPosition + 60 > 280) {
+                        doc.addPage();
+                        yPosition = 30;
+                    }
+                    addWrappedTextToPDF("Foto " + index + ": " + descricaoFoto);
+                    doc.addImage(base64, 'JPEG', 10, yPosition, 80, 60);
+                    yPosition += 70;
+                    processNextImage(index + 1);
+                });
+            } else if (document.getElementById("foto" + (index + 1))) {
+                processNextImage(index + 1);
+            } else {
+                concluirPDF();
+            }
+        }
+
+        function concluirPDF() {
+            const observacoesFinais = document.getElementById('observacoes_finais').value;
+            const dataInspecao = document.getElementById('data_inspecao').value;
+            const assinatura = document.getElementById('assinatura').value;
+
+            addWrappedTextToPDF("Conclusão da Inspeção:");
+            addWrappedTextToPDF(observacoesFinais);
+            addWrappedTextToPDF("Data da Inspeção: " + dataInspecao);
+            addWrappedTextToPDF("Assinatura do Inspetor: " + assinatura);
+            doc.save("relatorio_inspecao.pdf");
+        }
+
+        processNextImage(1);
+    }
+</script>
+
+</body>
+</html>
